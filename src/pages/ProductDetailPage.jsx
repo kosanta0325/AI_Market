@@ -12,21 +12,20 @@ export default function ProductDetailPage() {
   if (!product) {
     return (
       <div style={styles.notFound}>
-        <p>商品が見つかりませんでした</p>
-        <button onClick={() => navigate('/')} style={styles.backBtn}>一覧に戻る</button>
+        <p style={{ color: '#475569' }}>商品が見つかりませんでした</p>
+        <button onClick={() => navigate('/')} style={styles.backBtnAlt}>一覧に戻る</button>
       </div>
     )
   }
 
   return (
     <div style={styles.container}>
-      {/* Back button */}
       <button onClick={() => navigate(-1)} style={styles.backLink}>
         ← 一覧に戻る
       </button>
 
       <div style={styles.layout}>
-        {/* Left: Images */}
+        {/* Images */}
         <div style={styles.imageSection}>
           <div style={styles.mainImageWrapper}>
             <img
@@ -35,44 +34,44 @@ export default function ProductDetailPage() {
               style={styles.mainImage}
               onError={e => { e.target.src = 'https://via.placeholder.com/600x400?text=No+Image' }}
             />
+            <div style={styles.imageOverlay} />
             <span style={styles.categoryBadge}>{product.category}</span>
           </div>
           {product.images.length > 1 && (
             <div style={styles.thumbnails}>
               {product.images.map((img, i) => (
-                <img
+                <div
                   key={i}
-                  src={img}
-                  alt={`サムネイル ${i + 1}`}
                   onClick={() => setCurrentImage(i)}
-                  style={{
-                    ...styles.thumbnail,
-                    ...(currentImage === i ? styles.thumbnailActive : {}),
-                  }}
-                  onError={e => { e.target.src = 'https://via.placeholder.com/80x60?text=No' }}
-                />
+                  style={{ ...styles.thumbnailWrapper, ...(currentImage === i ? styles.thumbnailWrapperActive : {}) }}
+                >
+                  <img
+                    src={img}
+                    alt=""
+                    style={styles.thumbnail}
+                    onError={e => { e.target.src = 'https://via.placeholder.com/80x60' }}
+                  />
+                </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Right: Info */}
+        {/* Info */}
         <div style={styles.infoSection}>
           <h1 style={styles.title}>{product.title}</h1>
 
-          {/* Rating */}
           <div style={styles.ratingRow}>
             <span style={styles.stars}>{'★'.repeat(Math.round(product.rating))}</span>
-            <span style={styles.ratingText}>{product.rating} ({product.reviewCount}件のレビュー)</span>
+            <span style={styles.ratingText}>{product.rating}</span>
+            <span style={styles.ratingCount}>({product.reviewCount}件のレビュー)</span>
           </div>
 
-          {/* Price */}
           <div style={styles.priceBlock}>
             <span style={styles.price}>¥{product.price.toLocaleString()}</span>
-            <span style={styles.priceSub}>（税込）</span>
+            <span style={styles.priceSub}>税込</span>
           </div>
 
-          {/* Tags */}
           <div style={styles.tags}>
             {product.tags.map(tag => (
               <span key={tag} style={styles.tag}>#{tag}</span>
@@ -86,22 +85,23 @@ export default function ProductDetailPage() {
               <div style={styles.sellerLabel}>販売者</div>
               <div style={styles.sellerName}>{product.seller}</div>
             </div>
+            <div style={styles.sellerVerified}>✓ 認証済み</div>
           </div>
 
-          {/* Delivery & Payment Info */}
-          <div style={styles.infoGrid}>
-            <div style={styles.infoItem}>
-              <span style={styles.infoIcon}>📦</span>
+          {/* Info items */}
+          <div style={styles.infoCards}>
+            <div style={styles.infoCard}>
+              <div style={styles.infoCardIcon}>📦</div>
               <div>
                 <div style={styles.infoLabel}>納品予定</div>
                 <div style={styles.infoValue}>購入後 {product.deliveryDays}日以内</div>
               </div>
             </div>
-            <div style={styles.infoItem}>
-              <span style={styles.infoIcon}>💳</span>
+            <div style={styles.infoCard}>
+              <div style={styles.infoCardIcon}>💳</div>
               <div>
                 <div style={styles.infoLabel}>支払方法</div>
-                <div style={styles.infoValue}>{product.paymentMethods.join(' / ')}</div>
+                <div style={styles.infoValue}>{product.paymentMethods.join(' · ')}</div>
               </div>
             </div>
           </div>
@@ -110,34 +110,45 @@ export default function ProductDetailPage() {
 
       {/* Description */}
       <div style={styles.descSection}>
-        <h2 style={styles.descTitle}>商品の説明</h2>
+        <div style={styles.descHeader}>
+          <span style={styles.descHeaderLine} />
+          <h2 style={styles.descTitle}>商品の説明</h2>
+          <span style={styles.descHeaderLine} />
+        </div>
         <div style={styles.descText}>
           {product.description.split('\n').map((line, i) => (
-            <p key={i} style={line === '' ? styles.descEmpty : styles.descLine}>{line}</p>
+            <p key={i} style={line === '' ? { marginBottom: 12 } : styles.descLine}>{line}</p>
           ))}
         </div>
       </div>
 
-      {/* Sticky payment button */}
+      {/* Sticky bar */}
       <div style={styles.stickyBar}>
         <div style={styles.stickyInner}>
-          <div style={styles.stickyPrice}>¥{product.price.toLocaleString()}</div>
-          <button
-            style={styles.payButton}
-            onClick={() => setShowPaymentModal(true)}
-          >
-            支払いに進む
+          <div>
+            <div style={styles.stickyLabel}>価格</div>
+            <div style={styles.stickyPrice}>¥{product.price.toLocaleString()}</div>
+          </div>
+          <button style={styles.payButton} onClick={() => setShowPaymentModal(true)}>
+            <span>支払いに進む</span>
+            <span style={styles.payBtnArrow}>→</span>
           </button>
         </div>
       </div>
 
-      {/* Payment modal */}
+      {/* Modal */}
       {showPaymentModal && (
         <div style={styles.modalOverlay} onClick={() => setShowPaymentModal(false)}>
           <div style={styles.modal} onClick={e => e.stopPropagation()}>
-            <h2 style={styles.modalTitle}>お支払い方法を選択</h2>
-            <p style={styles.modalProduct}>{product.title}</p>
-            <p style={styles.modalPrice}>¥{product.price.toLocaleString()}</p>
+            <div style={styles.modalGlow} />
+            <div style={styles.modalTop}>
+              <h2 style={styles.modalTitle}>支払い方法を選択</h2>
+              <button style={styles.modalCloseX} onClick={() => setShowPaymentModal(false)}>✕</button>
+            </div>
+            <div style={styles.modalProductInfo}>
+              <p style={styles.modalProductName}>{product.title}</p>
+              <p style={styles.modalPrice}>¥{product.price.toLocaleString()}</p>
+            </div>
             <div style={styles.paymentOptions}>
               {product.paymentMethods.map(method => (
                 <button key={method} style={styles.paymentOption}>
@@ -148,13 +159,11 @@ export default function ProductDetailPage() {
                      method === 'PayPal' ? '🌐' :
                      method === 'LINE Pay' ? '💚' : '💰'}
                   </span>
-                  {method}
+                  <span>{method}</span>
+                  <span style={styles.paymentArrow}>→</span>
                 </button>
               ))}
             </div>
-            <button style={styles.modalClose} onClick={() => setShowPaymentModal(false)}>
-              キャンセル
-            </button>
           </div>
         </div>
       )}
@@ -166,119 +175,143 @@ const styles = {
   container: {
     maxWidth: 1100,
     margin: '0 auto',
-    padding: '24px 20px 120px',
+    padding: '28px 24px 120px',
   },
   notFound: {
     textAlign: 'center',
     padding: '80px 20px',
-    color: '#888',
   },
-  backLink: {
-    background: 'none',
-    border: 'none',
-    color: '#6c47ff',
-    fontSize: 14,
-    fontWeight: 500,
-    cursor: 'pointer',
-    padding: '0 0 20px',
-    display: 'block',
-  },
-  backBtn: {
+  backBtnAlt: {
     marginTop: 16,
     padding: '10px 24px',
-    backgroundColor: '#6c47ff',
+    background: 'linear-gradient(135deg, #8b5cf6, #22d3ee)',
     color: '#fff',
     border: 'none',
     borderRadius: 8,
     fontSize: 14,
     cursor: 'pointer',
   },
+  backLink: {
+    background: 'none',
+    border: 'none',
+    color: '#64748b',
+    fontSize: 14,
+    cursor: 'pointer',
+    padding: '0 0 24px',
+    display: 'block',
+    transition: 'color 0.2s',
+  },
   layout: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
-    gap: 40,
+    gap: 48,
     marginBottom: 40,
   },
   imageSection: {},
   mainImageWrapper: {
     position: 'relative',
-    borderRadius: 16,
+    borderRadius: 18,
     overflow: 'hidden',
-    backgroundColor: '#f0ebff',
+    backgroundColor: '#0b0b1a',
+    border: '1px solid rgba(139,92,246,0.15)',
     aspectRatio: '4/3',
   },
   mainImage: {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
+    filter: 'brightness(0.9)',
+  },
+  imageOverlay: {
+    position: 'absolute',
+    inset: 0,
+    background: 'linear-gradient(to top, rgba(5,5,15,0.6) 0%, transparent 50%)',
+    pointerEvents: 'none',
   },
   categoryBadge: {
     position: 'absolute',
     top: 14,
     left: 14,
-    backgroundColor: 'rgba(108,71,255,0.9)',
-    color: '#fff',
+    backgroundColor: 'rgba(139,92,246,0.25)',
+    color: '#a78bfa',
     padding: '4px 12px',
     borderRadius: 20,
     fontSize: 12,
     fontWeight: 600,
+    border: '1px solid rgba(139,92,246,0.3)',
+    backdropFilter: 'blur(8px)',
   },
   thumbnails: {
     display: 'flex',
     gap: 8,
     marginTop: 10,
   },
-  thumbnail: {
-    width: 80,
-    height: 60,
-    objectFit: 'cover',
+  thumbnailWrapper: {
+    width: 76,
+    height: 58,
     borderRadius: 8,
-    border: '2px solid transparent',
+    overflow: 'hidden',
+    border: '2px solid rgba(139,92,246,0.1)',
     cursor: 'pointer',
-    opacity: 0.7,
-    transition: 'all 0.15s',
+    transition: 'all 0.2s',
+    opacity: 0.6,
   },
-  thumbnailActive: {
-    borderColor: '#6c47ff',
+  thumbnailWrapperActive: {
+    borderColor: '#8b5cf6',
     opacity: 1,
+    boxShadow: '0 0 10px rgba(139,92,246,0.4)',
+  },
+  thumbnail: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
   },
   infoSection: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 16,
+    gap: 18,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 800,
-    color: '#111',
-    lineHeight: 1.4,
+    color: '#f1f5f9',
+    lineHeight: 1.3,
+    letterSpacing: '-0.5px',
   },
   ratingRow: {
     display: 'flex',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   stars: {
-    color: '#f5a623',
-    fontSize: 16,
+    color: '#f59e0b',
+    fontSize: 14,
   },
   ratingText: {
+    fontSize: 14,
+    fontWeight: 700,
+    color: '#94a3b8',
+  },
+  ratingCount: {
     fontSize: 13,
-    color: '#888',
+    color: '#475569',
   },
   priceBlock: {
     display: 'flex',
     alignItems: 'baseline',
-    gap: 6,
+    gap: 8,
   },
   price: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: 800,
-    color: '#e04040',
+    background: 'linear-gradient(90deg, #22d3ee, #a78bfa)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
   },
   priceSub: {
     fontSize: 13,
-    color: '#888',
+    color: '#475569',
   },
   tags: {
     display: 'flex',
@@ -287,24 +320,26 @@ const styles = {
   },
   tag: {
     fontSize: 12,
-    color: '#6c47ff',
-    backgroundColor: '#f0ebff',
+    color: '#64748b',
+    backgroundColor: 'rgba(139,92,246,0.08)',
     padding: '4px 12px',
-    borderRadius: 20,
+    borderRadius: 6,
+    border: '1px solid rgba(139,92,246,0.12)',
   },
   sellerCard: {
     display: 'flex',
     alignItems: 'center',
     gap: 12,
     padding: '14px 16px',
-    backgroundColor: '#f8f8f8',
+    backgroundColor: 'rgba(139,92,246,0.06)',
     borderRadius: 12,
+    border: '1px solid rgba(139,92,246,0.12)',
   },
   sellerAvatar: {
-    width: 42,
-    height: 42,
+    width: 40,
+    height: 40,
     borderRadius: '50%',
-    backgroundColor: '#6c47ff',
+    background: 'linear-gradient(135deg, #8b5cf6, #22d3ee)',
     color: '#fff',
     display: 'flex',
     alignItems: 'center',
@@ -312,78 +347,99 @@ const styles = {
     fontSize: 16,
     fontWeight: 700,
     flexShrink: 0,
+    boxShadow: '0 0 12px rgba(139,92,246,0.3)',
   },
   sellerLabel: {
     fontSize: 11,
-    color: '#999',
+    color: '#475569',
     marginBottom: 2,
   },
   sellerName: {
     fontSize: 14,
     fontWeight: 600,
-    color: '#333',
+    color: '#e2e8f0',
   },
-  infoGrid: {
+  sellerVerified: {
+    marginLeft: 'auto',
+    fontSize: 11,
+    color: '#22d3ee',
+    border: '1px solid rgba(34,211,238,0.3)',
+    padding: '3px 10px',
+    borderRadius: 20,
+    backgroundColor: 'rgba(34,211,238,0.06)',
+  },
+  infoCards: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 10,
+    gap: 8,
   },
-  infoItem: {
+  infoCard: {
     display: 'flex',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: 12,
     padding: '12px 16px',
-    backgroundColor: '#f8f8f8',
+    backgroundColor: 'rgba(255,255,255,0.02)',
     borderRadius: 10,
+    border: '1px solid rgba(255,255,255,0.05)',
   },
-  infoIcon: {
+  infoCardIcon: {
     fontSize: 20,
-    marginTop: 2,
+    flexShrink: 0,
   },
   infoLabel: {
     fontSize: 11,
-    color: '#999',
+    color: '#475569',
     marginBottom: 2,
   },
   infoValue: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 600,
-    color: '#333',
+    color: '#94a3b8',
   },
   descSection: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: '28px 32px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+    backgroundColor: '#0e0e20',
+    borderRadius: 18,
+    padding: '32px 36px',
+    border: '1px solid rgba(139,92,246,0.1)',
+    marginBottom: 20,
+  },
+  descHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 24,
+  },
+  descHeaderLine: {
+    flex: 1,
+    height: 1,
+    background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.3), transparent)',
   },
   descTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 700,
-    color: '#111',
-    marginBottom: 16,
-    paddingBottom: 12,
-    borderBottom: '1.5px solid #f0f0f0',
+    color: '#a78bfa',
+    whiteSpace: 'nowrap',
+    letterSpacing: '0.05em',
   },
   descText: {
-    color: '#444',
-    lineHeight: 1.8,
+    color: '#94a3b8',
+    lineHeight: 1.9,
+    fontSize: 14,
   },
   descLine: {
     marginBottom: 4,
-  },
-  descEmpty: {
-    marginBottom: 12,
   },
   stickyBar: {
     position: 'fixed',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
-    borderTop: '1px solid #e0e0e0',
-    boxShadow: '0 -4px 20px rgba(0,0,0,0.08)',
+    backgroundColor: 'rgba(5,5,15,0.9)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    borderTop: '1px solid rgba(139,92,246,0.15)',
     zIndex: 200,
-    padding: '12px 20px',
+    padding: '14px 24px',
   },
   stickyInner: {
     maxWidth: 1100,
@@ -391,29 +447,46 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    gap: 20,
+    gap: 24,
+  },
+  stickyLabel: {
+    fontSize: 11,
+    color: '#475569',
+    marginBottom: 2,
   },
   stickyPrice: {
     fontSize: 22,
     fontWeight: 800,
-    color: '#e04040',
+    background: 'linear-gradient(90deg, #22d3ee, #a78bfa)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
   },
   payButton: {
-    backgroundColor: '#6c47ff',
+    background: 'linear-gradient(135deg, #7c3aed, #0891b2)',
     color: '#fff',
     border: 'none',
     borderRadius: 12,
-    padding: '14px 48px',
-    fontSize: 16,
+    padding: '14px 40px',
+    fontSize: 15,
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 4px 16px rgba(108,71,255,0.35)',
-    transition: 'opacity 0.15s, transform 0.1s',
+    boxShadow: '0 0 24px rgba(139,92,246,0.4)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    letterSpacing: '0.02em',
+    transition: 'opacity 0.2s, transform 0.1s',
+  },
+  payBtnArrow: {
+    fontSize: 18,
+    fontWeight: 300,
   },
   modalOverlay: {
     position: 'fixed',
     inset: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    backdropFilter: 'blur(8px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -421,50 +494,82 @@ const styles = {
     padding: 20,
   },
   modal: {
-    backgroundColor: '#fff',
+    backgroundColor: '#0e0e20',
     borderRadius: 20,
-    padding: '32px 28px',
+    padding: '28px',
     width: '100%',
     maxWidth: 400,
-    boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+    border: '1px solid rgba(139,92,246,0.25)',
+    boxShadow: '0 0 60px rgba(139,92,246,0.2)',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  modalGlow: {
+    position: 'absolute',
+    top: -60,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 200,
+    height: 120,
+    background: 'radial-gradient(ellipse, rgba(139,92,246,0.15), transparent)',
+    pointerEvents: 'none',
+  },
+  modalTop: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 800,
-    color: '#111',
-    marginBottom: 16,
-    textAlign: 'center',
+    color: '#f1f5f9',
   },
-  modalProduct: {
-    fontSize: 14,
-    color: '#555',
+  modalCloseX: {
+    background: 'none',
+    border: 'none',
+    color: '#475569',
+    fontSize: 16,
+    cursor: 'pointer',
+    padding: 4,
+  },
+  modalProductInfo: {
     textAlign: 'center',
-    marginBottom: 4,
+    padding: '16px',
+    backgroundColor: 'rgba(139,92,246,0.06)',
+    borderRadius: 12,
+    border: '1px solid rgba(139,92,246,0.1)',
+    marginBottom: 16,
+  },
+  modalProductName: {
+    fontSize: 13,
+    color: '#64748b',
+    marginBottom: 6,
   },
   modalPrice: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: 800,
-    color: '#e04040',
-    textAlign: 'center',
-    marginBottom: 20,
+    background: 'linear-gradient(90deg, #22d3ee, #a78bfa)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
   },
   paymentOptions: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 10,
-    marginBottom: 16,
+    gap: 8,
   },
   paymentOption: {
     display: 'flex',
     alignItems: 'center',
     gap: 12,
-    padding: '14px 20px',
-    border: '1.5px solid #e0e0e0',
+    padding: '14px 16px',
+    border: '1px solid rgba(139,92,246,0.15)',
     borderRadius: 12,
-    backgroundColor: '#fff',
-    fontSize: 15,
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    fontSize: 14,
     fontWeight: 600,
-    color: '#333',
+    color: '#e2e8f0',
     cursor: 'pointer',
     transition: 'all 0.15s',
     textAlign: 'left',
@@ -472,15 +577,9 @@ const styles = {
   paymentIcon: {
     fontSize: 20,
   },
-  modalClose: {
-    width: '100%',
-    padding: '12px',
-    backgroundColor: '#f5f5f5',
-    border: 'none',
-    borderRadius: 12,
-    fontSize: 14,
-    color: '#888',
-    cursor: 'pointer',
-    fontWeight: 600,
+  paymentArrow: {
+    marginLeft: 'auto',
+    color: '#475569',
+    fontSize: 16,
   },
 }

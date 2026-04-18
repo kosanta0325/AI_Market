@@ -91,13 +91,19 @@ export default function SellerPage() {
   if (submitted) {
     return (
       <div style={styles.successContainer}>
+        <div style={styles.successGlow} />
         <div style={styles.successCard}>
-          <div style={styles.successIcon}>✅</div>
-          <h2 style={styles.successTitle}>出品が完了しました！</h2>
-          <p style={styles.successDesc}>「{form.title}」を出品しました。審査後に公開されます。</p>
+          <div style={styles.successIconWrapper}>
+            <span style={styles.successIcon}>✓</span>
+          </div>
+          <h2 style={styles.successTitle}>出品完了</h2>
+          <p style={styles.successDesc}>「{form.title}」を出品しました。<br />審査後に公開されます。</p>
           <div style={styles.successButtons}>
             <button onClick={() => navigate('/')} style={styles.successBtn}>商品一覧を見る</button>
-            <button onClick={() => { setSubmitted(false); setForm({ title: '', category: '', price: '', description: '', deliveryDays: '1', paymentMethods: [], tags: '' }); setImages([]) }} style={styles.successBtnSecondary}>
+            <button
+              onClick={() => { setSubmitted(false); setForm({ title: '', category: '', price: '', description: '', deliveryDays: '1', paymentMethods: [], tags: '' }); setImages([]) }}
+              style={styles.successBtnSecondary}
+            >
               続けて出品する
             </button>
           </div>
@@ -108,18 +114,20 @@ export default function SellerPage() {
 
   return (
     <div style={styles.container}>
-      <div style={styles.header}>
+      <div style={styles.headerSection}>
+        <div style={styles.headerBadge}>⬡ 新規出品</div>
         <h1 style={styles.pageTitle}>AIツールを出品する</h1>
-        <p style={styles.pageSubtitle}>あなたが作ったAIツールを販売しましょう</p>
+        <p style={styles.pageSubtitle}>あなたが作ったAIツールを世界に届けよう</p>
       </div>
 
       <form onSubmit={handleSubmit} style={styles.form}>
         {/* Images */}
         <div style={styles.section}>
-          <label style={styles.sectionTitle}>
-            商品画像 <span style={styles.required}>必須</span>
-            <span style={styles.hint}>最大5枚・JPG/PNG/GIF対応</span>
-          </label>
+          <div style={styles.labelRow}>
+            <label style={styles.sectionTitle}>商品画像</label>
+            <span style={styles.required}>必須</span>
+            <span style={styles.hint}>最大5枚</span>
+          </div>
 
           <div
             style={{ ...styles.dropzone, ...(dragOver ? styles.dropzoneActive : {}) }}
@@ -128,32 +136,23 @@ export default function SellerPage() {
             onDragLeave={() => setDragOver(false)}
             onDrop={e => { e.preventDefault(); setDragOver(false); handleFileSelect(e.dataTransfer.files) }}
           >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              style={{ display: 'none' }}
-              onChange={e => handleFileSelect(e.target.files)}
-            />
-            <span style={styles.dropzoneIcon}>📷</span>
-            <span style={styles.dropzoneText}>クリックまたはドラッグ＆ドロップで画像を追加</span>
-            <span style={styles.dropzoneSubText}>JPG / PNG / GIF（最大5枚）</span>
+            <input ref={fileInputRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={e => handleFileSelect(e.target.files)} />
+            <div style={styles.dropzoneIconWrapper}>
+              <span style={styles.dropzoneIcon}>↑</span>
+            </div>
+            <span style={styles.dropzoneText}>クリックまたはドラッグ＆ドロップ</span>
+            <span style={styles.dropzoneSubText}>JPG · PNG · GIF（最大5枚）</span>
           </div>
 
           {errors.images && <span style={styles.error}>{errors.images}</span>}
 
           {images.length > 0 && (
-            <div style={styles.imagePreviewGrid}>
+            <div style={styles.imageGrid}>
               {images.map((img, i) => (
-                <div key={i} style={styles.imagePreviewItem}>
-                  {i === 0 && <span style={styles.mainBadge}>メイン</span>}
-                  <img src={img.url} alt={img.name} style={styles.previewImg} />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(i)}
-                    style={styles.removeImageBtn}
-                  >×</button>
+                <div key={i} style={styles.imageItem}>
+                  {i === 0 && <span style={styles.mainBadge}>MAIN</span>}
+                  <img src={img.url} alt="" style={styles.previewImg} />
+                  <button type="button" onClick={() => removeImage(i)} style={styles.removeBtn}>✕</button>
                 </div>
               ))}
             </div>
@@ -162,9 +161,10 @@ export default function SellerPage() {
 
         {/* Title */}
         <div style={styles.section}>
-          <label style={styles.sectionTitle}>
-            商品名 <span style={styles.required}>必須</span>
-          </label>
+          <div style={styles.labelRow}>
+            <label style={styles.sectionTitle}>商品名</label>
+            <span style={styles.required}>必須</span>
+          </div>
           <input
             type="text"
             value={form.title}
@@ -178,27 +178,27 @@ export default function SellerPage() {
         {/* Category & Price */}
         <div style={styles.row}>
           <div style={{ ...styles.section, flex: 1 }}>
-            <label style={styles.sectionTitle}>
-              カテゴリ <span style={styles.required}>必須</span>
-            </label>
+            <div style={styles.labelRow}>
+              <label style={styles.sectionTitle}>カテゴリ</label>
+              <span style={styles.required}>必須</span>
+            </div>
             <select
               value={form.category}
               onChange={e => handleChange('category', e.target.value)}
               style={{ ...styles.input, ...(errors.category ? styles.inputError : {}) }}
             >
               <option value="">選択してください</option>
-              {CATEGORIES.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
+              {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </select>
             {errors.category && <span style={styles.error}>{errors.category}</span>}
           </div>
 
           <div style={{ ...styles.section, flex: 1 }}>
-            <label style={styles.sectionTitle}>
-              価格（円） <span style={styles.required}>必須</span>
-            </label>
-            <div style={styles.priceInputWrapper}>
+            <div style={styles.labelRow}>
+              <label style={styles.sectionTitle}>価格（円）</label>
+              <span style={styles.required}>必須</span>
+            </div>
+            <div style={styles.priceWrapper}>
               <span style={styles.pricePrefix}>¥</span>
               <input
                 type="number"
@@ -215,79 +215,73 @@ export default function SellerPage() {
 
         {/* Description */}
         <div style={styles.section}>
-          <label style={styles.sectionTitle}>
-            商品の説明 <span style={styles.required}>必須</span>
-          </label>
+          <div style={styles.labelRow}>
+            <label style={styles.sectionTitle}>商品の説明</label>
+            <span style={styles.required}>必須</span>
+            <span style={styles.charCountBadge}>{form.description.length}文字</span>
+          </div>
           <textarea
             value={form.description}
             onChange={e => handleChange('description', e.target.value)}
-            placeholder="商品の機能・使い方・動作環境など詳しく記載してください&#10;&#10;例：&#10;【機能】&#10;- XXX&#10;- YYY&#10;&#10;【対応環境】&#10;Windows / Mac"
+            placeholder="商品の機能・使い方・動作環境など詳しく記載してください&#10;&#10;【機能】&#10;- XXX&#10;&#10;【対応環境】&#10;Windows / Mac"
             rows={10}
             style={{ ...styles.textarea, ...(errors.description ? styles.inputError : {}) }}
           />
-          <div style={styles.charCount}>{form.description.length}文字</div>
           {errors.description && <span style={styles.error}>{errors.description}</span>}
         </div>
 
         {/* Tags */}
         <div style={styles.section}>
-          <label style={styles.sectionTitle}>
-            タグ <span style={styles.optional}>任意</span>
-          </label>
+          <div style={styles.labelRow}>
+            <label style={styles.sectionTitle}>タグ</label>
+            <span style={styles.optional}>任意</span>
+          </div>
           <input
             type="text"
             value={form.tags}
             onChange={e => handleChange('tags', e.target.value)}
-            placeholder="カンマ区切りで入力　例：自動化, SEO, ブログ"
+            placeholder="カンマ区切り　例：自動化, SEO, ブログ"
             style={styles.input}
           />
-          <span style={styles.hintText}>タグを付けると検索されやすくなります</span>
         </div>
 
         {/* Delivery */}
         <div style={styles.section}>
-          <label style={styles.sectionTitle}>
-            納品予定日数 <span style={styles.required}>必須</span>
-          </label>
-          <div style={styles.deliveryOptions}>
+          <div style={styles.labelRow}>
+            <label style={styles.sectionTitle}>納品予定日数</label>
+            <span style={styles.required}>必須</span>
+          </div>
+          <div style={styles.deliveryGrid}>
             {['1', '2', '3', '5', '7', '14'].map(day => (
               <button
                 key={day}
                 type="button"
                 onClick={() => handleChange('deliveryDays', day)}
-                style={{
-                  ...styles.deliveryBtn,
-                  ...(form.deliveryDays === day ? styles.deliveryBtnActive : {}),
-                }}
+                style={{ ...styles.deliveryBtn, ...(form.deliveryDays === day ? styles.deliveryBtnActive : {}) }}
               >
                 {day}日以内
               </button>
             ))}
           </div>
-          <span style={styles.hintText}>購入後、何日以内に納品できますか？</span>
         </div>
 
-        {/* Payment Methods */}
+        {/* Payment */}
         <div style={styles.section}>
-          <label style={styles.sectionTitle}>
-            受付可能な支払い方法 <span style={styles.required}>必須</span>
-          </label>
+          <div style={styles.labelRow}>
+            <label style={styles.sectionTitle}>受付可能な支払い方法</label>
+            <span style={styles.required}>必須</span>
+          </div>
           <div style={styles.paymentGrid}>
             {PAYMENT_OPTIONS.map(opt => (
               <button
                 key={opt.id}
                 type="button"
                 onClick={() => togglePayment(opt.id)}
-                style={{
-                  ...styles.paymentBtn,
-                  ...(form.paymentMethods.includes(opt.id) ? styles.paymentBtnActive : {}),
-                }}
+                style={{ ...styles.paymentBtn, ...(form.paymentMethods.includes(opt.id) ? styles.paymentBtnActive : {}) }}
               >
-                <span style={styles.paymentBtnIcon}>{opt.icon}</span>
-                {opt.label}
-                {form.paymentMethods.includes(opt.id) && (
-                  <span style={styles.checkmark}>✓</span>
-                )}
+                <span style={styles.payBtnIcon}>{opt.icon}</span>
+                <span>{opt.label}</span>
+                {form.paymentMethods.includes(opt.id) && <span style={styles.checkmark}>✓</span>}
               </button>
             ))}
           </div>
@@ -295,14 +289,10 @@ export default function SellerPage() {
         </div>
 
         {/* Submit */}
-        <div style={styles.submitSection}>
-          <button type="submit" style={styles.submitBtn}>
-            出品する
-          </button>
-          <p style={styles.submitNote}>
-            出品後、運営が内容を確認してから公開されます（通常1〜2営業日）
-          </p>
-        </div>
+        <button type="submit" style={styles.submitBtn}>
+          出品する →
+        </button>
+        <p style={styles.submitNote}>出品後、運営が確認してから公開されます（通常1〜2営業日）</p>
       </form>
     </div>
   )
@@ -310,22 +300,35 @@ export default function SellerPage() {
 
 const styles = {
   container: {
-    maxWidth: 720,
+    maxWidth: 680,
     margin: '0 auto',
-    padding: '32px 20px 80px',
+    padding: '40px 24px 80px',
   },
-  header: {
-    marginBottom: 32,
+  headerSection: {
+    marginBottom: 36,
+  },
+  headerBadge: {
+    display: 'inline-block',
+    padding: '5px 14px',
+    borderRadius: 20,
+    border: '1px solid rgba(139,92,246,0.4)',
+    color: '#8b5cf6',
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: '0.08em',
+    marginBottom: 14,
+    background: 'rgba(139,92,246,0.07)',
   },
   pageTitle: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: 800,
-    color: '#111',
-    marginBottom: 6,
+    color: '#f1f5f9',
+    marginBottom: 8,
+    letterSpacing: '-0.5px',
   },
   pageSubtitle: {
-    fontSize: 15,
-    color: '#888',
+    fontSize: 14,
+    color: '#64748b',
   },
   form: {
     display: 'flex',
@@ -339,281 +342,319 @@ const styles = {
   },
   row: {
     display: 'flex',
-    gap: 20,
+    gap: 16,
   },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: 700,
-    color: '#333',
+  labelRow: {
     display: 'flex',
     alignItems: 'center',
-    gap: 6,
+    gap: 7,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: 700,
+    color: '#94a3b8',
+    letterSpacing: '0.03em',
   },
   required: {
-    fontSize: 11,
-    backgroundColor: '#ff4757',
-    color: '#fff',
-    padding: '2px 6px',
+    fontSize: 10,
+    backgroundColor: 'rgba(239,68,68,0.15)',
+    color: '#f87171',
+    padding: '2px 7px',
     borderRadius: 4,
-    fontWeight: 600,
+    fontWeight: 700,
+    border: '1px solid rgba(239,68,68,0.2)',
   },
   optional: {
-    fontSize: 11,
-    backgroundColor: '#e0e0e0',
-    color: '#777',
-    padding: '2px 6px',
+    fontSize: 10,
+    backgroundColor: 'rgba(100,116,139,0.1)',
+    color: '#64748b',
+    padding: '2px 7px',
     borderRadius: 4,
     fontWeight: 600,
   },
   hint: {
     fontSize: 11,
-    color: '#aaa',
-    fontWeight: 400,
+    color: '#334155',
     marginLeft: 'auto',
   },
-  hintText: {
-    fontSize: 12,
-    color: '#aaa',
+  charCountBadge: {
+    marginLeft: 'auto',
+    fontSize: 11,
+    color: '#334155',
   },
   input: {
     padding: '12px 14px',
     borderRadius: 10,
-    border: '1.5px solid #e0e0e0',
+    border: '1px solid rgba(139,92,246,0.15)',
     fontSize: 14,
     outline: 'none',
-    backgroundColor: '#fff',
-    transition: 'border-color 0.15s',
+    backgroundColor: 'rgba(14,14,32,0.8)',
+    color: '#e2e8f0',
+    transition: 'border-color 0.2s, box-shadow 0.2s',
     width: '100%',
   },
   inputError: {
-    borderColor: '#ff4757',
+    borderColor: 'rgba(239,68,68,0.4)',
   },
   textarea: {
     padding: '12px 14px',
     borderRadius: 10,
-    border: '1.5px solid #e0e0e0',
+    border: '1px solid rgba(139,92,246,0.15)',
     fontSize: 14,
     outline: 'none',
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(14,14,32,0.8)',
+    color: '#e2e8f0',
     resize: 'vertical',
-    lineHeight: 1.7,
+    lineHeight: 1.8,
     width: '100%',
-  },
-  charCount: {
-    fontSize: 12,
-    color: '#bbb',
-    textAlign: 'right',
-    marginTop: -4,
   },
   error: {
     fontSize: 12,
-    color: '#ff4757',
+    color: '#f87171',
     fontWeight: 500,
   },
-  priceInputWrapper: {
+  priceWrapper: {
     position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
   },
   pricePrefix: {
     position: 'absolute',
     left: 14,
-    fontSize: 16,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    fontSize: 15,
     fontWeight: 700,
-    color: '#555',
+    color: '#64748b',
     pointerEvents: 'none',
+    zIndex: 1,
   },
   priceInput: {
     paddingLeft: 30,
   },
   dropzone: {
-    border: '2px dashed #d0c4ff',
+    border: '1px dashed rgba(139,92,246,0.3)',
     borderRadius: 12,
     padding: '32px 20px',
     textAlign: 'center',
     cursor: 'pointer',
-    backgroundColor: '#faf8ff',
-    transition: 'all 0.15s',
+    backgroundColor: 'rgba(139,92,246,0.03)',
+    transition: 'all 0.2s',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
   dropzoneActive: {
-    borderColor: '#6c47ff',
-    backgroundColor: '#f0ebff',
+    borderColor: '#8b5cf6',
+    backgroundColor: 'rgba(139,92,246,0.08)',
+    boxShadow: '0 0 20px rgba(139,92,246,0.15)',
+  },
+  dropzoneIconWrapper: {
+    width: 44,
+    height: 44,
+    borderRadius: '50%',
+    background: 'rgba(139,92,246,0.1)',
+    border: '1px solid rgba(139,92,246,0.2)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 20,
+    color: '#8b5cf6',
+    marginBottom: 4,
   },
   dropzoneIcon: {
-    fontSize: 32,
+    fontWeight: 300,
   },
   dropzoneText: {
     fontSize: 14,
     fontWeight: 600,
-    color: '#555',
+    color: '#94a3b8',
   },
   dropzoneSubText: {
     fontSize: 12,
-    color: '#aaa',
+    color: '#475569',
   },
-  imagePreviewGrid: {
+  imageGrid: {
     display: 'flex',
-    gap: 10,
+    gap: 8,
     flexWrap: 'wrap',
   },
-  imagePreviewItem: {
+  imageItem: {
     position: 'relative',
-    width: 100,
-    height: 80,
+    width: 96,
+    height: 72,
     borderRadius: 8,
     overflow: 'hidden',
-    border: '1.5px solid #e0e0e0',
+    border: '1px solid rgba(139,92,246,0.2)',
   },
   mainBadge: {
     position: 'absolute',
     bottom: 4,
     left: 4,
-    backgroundColor: 'rgba(108,71,255,0.85)',
+    backgroundColor: 'rgba(139,92,246,0.8)',
     color: '#fff',
-    fontSize: 9,
-    fontWeight: 700,
-    padding: '2px 6px',
-    borderRadius: 4,
+    fontSize: 8,
+    fontWeight: 800,
+    padding: '2px 5px',
+    borderRadius: 3,
     zIndex: 1,
+    letterSpacing: '0.05em',
   },
   previewImg: {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
+    filter: 'brightness(0.85)',
   },
-  removeImageBtn: {
+  removeBtn: {
     position: 'absolute',
     top: 3,
     right: 3,
-    width: 20,
-    height: 20,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    width: 18,
+    height: 18,
+    backgroundColor: 'rgba(0,0,0,0.7)',
     color: '#fff',
     border: 'none',
     borderRadius: '50%',
-    fontSize: 12,
+    fontSize: 9,
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     lineHeight: 1,
   },
-  deliveryOptions: {
+  deliveryGrid: {
     display: 'flex',
     gap: 8,
     flexWrap: 'wrap',
   },
   deliveryBtn: {
-    padding: '9px 18px',
-    borderRadius: 10,
-    border: '1.5px solid #e0e0e0',
-    backgroundColor: '#fff',
+    padding: '9px 16px',
+    borderRadius: 8,
+    border: '1px solid rgba(139,92,246,0.15)',
+    backgroundColor: 'transparent',
     fontSize: 13,
     fontWeight: 500,
-    color: '#555',
+    color: '#64748b',
     cursor: 'pointer',
     transition: 'all 0.15s',
   },
   deliveryBtnActive: {
-    borderColor: '#6c47ff',
-    backgroundColor: '#f0ebff',
-    color: '#6c47ff',
+    borderColor: 'rgba(139,92,246,0.6)',
+    backgroundColor: 'rgba(139,92,246,0.1)',
+    color: '#a78bfa',
     fontWeight: 700,
+    boxShadow: '0 0 10px rgba(139,92,246,0.15)',
   },
   paymentGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: 10,
+    gap: 8,
   },
   paymentBtn: {
     display: 'flex',
     alignItems: 'center',
     gap: 8,
-    padding: '12px 14px',
+    padding: '11px 14px',
     borderRadius: 10,
-    border: '1.5px solid #e0e0e0',
-    backgroundColor: '#fff',
-    fontSize: 13,
+    border: '1px solid rgba(139,92,246,0.12)',
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    fontSize: 12,
     fontWeight: 500,
-    color: '#555',
+    color: '#64748b',
     cursor: 'pointer',
     transition: 'all 0.15s',
     position: 'relative',
   },
   paymentBtnActive: {
-    borderColor: '#6c47ff',
-    backgroundColor: '#f0ebff',
-    color: '#6c47ff',
+    borderColor: 'rgba(139,92,246,0.5)',
+    backgroundColor: 'rgba(139,92,246,0.08)',
+    color: '#a78bfa',
     fontWeight: 700,
   },
-  paymentBtnIcon: {
-    fontSize: 18,
+  payBtnIcon: {
+    fontSize: 16,
   },
   checkmark: {
     marginLeft: 'auto',
-    color: '#6c47ff',
+    color: '#8b5cf6',
     fontWeight: 800,
-    fontSize: 14,
-  },
-  submitSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 12,
-    paddingTop: 8,
+    fontSize: 13,
   },
   submitBtn: {
     width: '100%',
     padding: '16px',
-    backgroundColor: '#6c47ff',
+    background: 'linear-gradient(135deg, #7c3aed, #0891b2)',
     color: '#fff',
     border: 'none',
     borderRadius: 12,
     fontSize: 16,
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 4px 16px rgba(108,71,255,0.35)',
-    transition: 'opacity 0.15s',
+    boxShadow: '0 0 24px rgba(139,92,246,0.35)',
+    letterSpacing: '0.03em',
+    transition: 'opacity 0.2s',
+    marginTop: 4,
   },
   submitNote: {
     fontSize: 12,
-    color: '#aaa',
+    color: '#334155',
     textAlign: 'center',
   },
   successContainer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 'calc(100vh - 60px)',
+    minHeight: 'calc(100vh - 64px)',
     padding: 20,
+    position: 'relative',
+  },
+  successGlow: {
+    position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    height: 400,
+    background: 'radial-gradient(ellipse, rgba(139,92,246,0.1), transparent 70%)',
+    pointerEvents: 'none',
   },
   successCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#0e0e20',
     borderRadius: 20,
     padding: '48px 40px',
     textAlign: 'center',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-    maxWidth: 440,
+    border: '1px solid rgba(139,92,246,0.2)',
+    boxShadow: '0 0 48px rgba(139,92,246,0.1)',
+    maxWidth: 420,
     width: '100%',
+    position: 'relative',
+  },
+  successIconWrapper: {
+    width: 64,
+    height: 64,
+    borderRadius: '50%',
+    background: 'linear-gradient(135deg, #7c3aed, #0891b2)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: '0 auto 20px',
+    boxShadow: '0 0 24px rgba(139,92,246,0.4)',
   },
   successIcon: {
-    fontSize: 56,
-    marginBottom: 20,
+    fontSize: 28,
+    color: '#fff',
+    fontWeight: 700,
   },
   successTitle: {
     fontSize: 24,
     fontWeight: 800,
-    color: '#111',
-    marginBottom: 12,
+    color: '#f1f5f9',
+    marginBottom: 10,
   },
   successDesc: {
     fontSize: 14,
-    color: '#666',
-    lineHeight: 1.7,
+    color: '#64748b',
+    lineHeight: 1.8,
     marginBottom: 28,
   },
   successButtons: {
@@ -623,19 +664,20 @@ const styles = {
   },
   successBtn: {
     padding: '14px',
-    backgroundColor: '#6c47ff',
+    background: 'linear-gradient(135deg, #7c3aed, #0891b2)',
     color: '#fff',
     border: 'none',
     borderRadius: 12,
     fontSize: 15,
     fontWeight: 700,
     cursor: 'pointer',
+    boxShadow: '0 0 16px rgba(139,92,246,0.3)',
   },
   successBtnSecondary: {
     padding: '14px',
-    backgroundColor: '#f5f5f5',
-    color: '#555',
-    border: 'none',
+    backgroundColor: 'transparent',
+    color: '#64748b',
+    border: '1px solid rgba(139,92,246,0.15)',
     borderRadius: 12,
     fontSize: 15,
     fontWeight: 600,
